@@ -55,11 +55,13 @@ enum class DriveType {
     TANK
 }
 
-private fun unwrap(e: Encoder): RawEncoder =
+private fun unwrap(e: Encoder): Encoder =
         when (e) {
             is OverflowEncoder -> e.encoder
             is RawEncoder -> e
+            else -> e
         }
+
 
 fun interface FeedforwardFactory {
     fun make(): MotorFeedforward
@@ -105,14 +107,14 @@ class DriveView(
         }
     }
 
-    fun resetAndBulkRead(t: MidpointTimer): Map<SerialNumber, Double> {
-        val times = mutableMapOf<SerialNumber, Double>()
+    fun resetAndBulkRead(t: MidpointTimer): Map<String, Double> {
+        val times = mutableMapOf<String, Double>()
         for (m in lynxModules) {
             m.clearBulkCache()
 
             t.addSplit()
             m.getBulkData()
-            times[m.serialNumber] = t.addSplit()
+            times[m.serialNumber.toString()] = t.addSplit()
         }
         return times
     }
@@ -151,8 +153,9 @@ interface DriveViewFactory {
 }
 
 // designed for manual bulk caching
-private fun recordEncoderData(e: Encoder, ts: Map<SerialNumber, Double>, ps: MutableSignal, vs: MutableSignal) {
-    val sn = (e.controller as LynxDcMotorController).serialNumber
+private fun recordEncoderData(e: Encoder, ts: Map<String, Double>, ps: MutableSignal, vs: MutableSignal) {
+    //val sn = (e.controller as LynxDcMotorController).serialNumber
+    val sn = e.key
     val p = e.getPositionAndVelocity()
 
     ps.times.add(ts[sn]!!)

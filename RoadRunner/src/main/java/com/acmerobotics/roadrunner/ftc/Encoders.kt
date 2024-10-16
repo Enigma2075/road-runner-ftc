@@ -1,5 +1,6 @@
 package com.acmerobotics.roadrunner.ftc
 
+import com.qualcomm.hardware.lynx.LynxDcMotorController
 import com.qualcomm.robotcore.hardware.DcMotorController
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
@@ -13,10 +14,11 @@ class PositionVelocityPair(
         @JvmField val rawPosition: Int, @JvmField val rawVelocity: Int
  )
 
-sealed interface Encoder {
+interface Encoder {
     fun getPositionAndVelocity(): PositionVelocityPair
 
-    val controller: DcMotorController
+    val key: String
+    //val controller: DcMotorController
     var direction: DcMotorSimple.Direction
 }
 
@@ -47,8 +49,10 @@ class RawEncoder(private val m: DcMotorEx) : Encoder {
         )
     }
 
-    override val controller: DcMotorController
-        get() = m.controller
+    override  val key: String
+        get() = (m.controller as LynxDcMotorController).serialNumber.toString()
+    //override val controller: DcMotorController
+    //    get() = m.controller
 }
 
 class RollingThreeMedian {
@@ -103,8 +107,11 @@ class OverflowEncoder(@JvmField val encoder: RawEncoder) : Encoder {
         )
     }
 
-    override val controller: DcMotorController
-        get() = encoder.controller
+    override  val key: String
+        get() = encoder.key
+
+    //override val controller: DcMotorController
+    //    get() = encoder.controller
 
     override var direction: DcMotorSimple.Direction
         get() = encoder.direction
