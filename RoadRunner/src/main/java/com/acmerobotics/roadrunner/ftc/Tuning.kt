@@ -116,6 +116,11 @@ class DriveView(
             m.getBulkData()
             times[m.serialNumber.toString()] = t.addSplit()
         }
+
+        if(parEncs[0] !is RawEncoder && parEncs[0] !is OverflowEncoder) {
+            parEncs[0].getPositionAndVelocity();
+            times[parEncs[0].key] = t.addSplit();
+        }
         return times
     }
 
