@@ -79,7 +79,7 @@ function fixVels(ts: number[], xs: number[], vs: number[]) {
     throw new Error(`${ts.length} !== ${xs.length} !== ${vs.length}`);
   }
 
-  return numDerivOffline(ts, xs).map((est, i) => inverseOverflow(vs[i + 1], est));
+  return vs.slice(2);// numDerivOffline(ts, xs).map((est, i) => inverseOverflow(vs[i + 1], est));
 }
 
 type RegressionOptions = {

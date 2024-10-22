@@ -83,7 +83,7 @@ class DriveView(
         rightEncs: List<Encoder>,
         parEncs: List<Encoder>,
         perpEncs: List<Encoder>,
-        val imu: LazyImu,
+        val pinpoint: LazyPinpoint,
         val voltageSensor: VoltageSensor,
         val feedforwardFactory: FeedforwardFactory,
 ) {
@@ -117,10 +117,10 @@ class DriveView(
             times[m.serialNumber.toString()] = t.addSplit()
         }
 
-        if(parEncs[0] !is RawEncoder && parEncs[0] !is OverflowEncoder) {
-            parEncs[0].getPositionAndVelocity();
-            times[parEncs[0].key] = t.addSplit();
-        }
+        t.addSplit();
+        pinpoint.update();
+        times[perpEncs[0].key] = t.addSplit();
+
         return times
     }
 
@@ -265,7 +265,7 @@ class AngularRampLogger(val dvf: DriveViewFactory) : LinearOpMode() {
 
             t.addSplit()
             // Use degrees here to work around https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1070
-            val av = view.imu.get().getRobotAngularVelocity(AngleUnit.DEGREES)
+            val av = view.pinpoint.getRobotAngularVelocity(AngleUnit.DEGREES)
             val time = t.addSplit()
 
             data.angVels[0].times.add(time)
